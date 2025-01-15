@@ -1,35 +1,96 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import supabase from "./supabase-client";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todoList, setTodoList] = useState([]);
+  const [newTodo, setNewTodo] = useState("");
+
+  // Fetch Todos on component mount
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  const fetchTodos = async () => {
+    const { data, error } = await supabase.from("todolist").select("*");
+    if (error) {
+      console.error("Error fetching todos: ", error);
+      alert("Failed to fetch todos. Please try again.");
+    } else {
+      setTodoList(data);
+    }
+  };
+
+  const addTodo = async () => {
+    const newTodoData = {
+      name: newTodo,
+      iscompleted: false,
+    };
+    const { data, error } = await supabase
+      .from("todolist")
+      .insert([newTodoData])
+      .single();
+
+    if (error) {
+      console.error("Error adding todo: ", error);
+    } else {
+      setTodoList((prev) => [...prev, data]);
+      setNewTodo("");
+    }
+  };
+
+  const completeTask = async (id, iscompleted) => {
+    const { error } = await supabase
+      .from("todolist")
+      .update({ iscompleted: !iscompleted })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error toggling task: ", error);
+    } else {
+      setTodoList((prev) =>
+        prev.map((todo) =>
+          todo.id === id ? { ...todo, iscompleted: !iscompleted } : todo
+        )
+      );
+    }
+  };
+
+  const deleteTask = async (id) => {
+    const { error } = await supabase.from("todolist").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting task: ", error);
+    } else {
+      setTodoList((prev) => prev.filter((todo) => todo.id !== id));
+    }
+  };
 
   return (
-    <>
+    <div>
+      <h1>Todo List</h1>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <input
+          type="text"
+          placeholder="New Todo..."
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+        />
+        <button onClick={addTodo}>Add Todo Item</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <ul>
+        {todoList.map((todo) => (
+          <li key={todo.id}>
+            <p>{todo.name}</p>
+            <button onClick={() => completeTask(todo.id, todo.iscompleted)}>
+              {todo.iscompleted ? "Undo" : "Complete Task"}
+            </button>
+            <button onClick={() => deleteTask(todo.id)}>Delete Task</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default App;
