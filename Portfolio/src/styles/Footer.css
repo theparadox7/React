@@ -1,33 +1,38 @@
 .footer {
-    background-color: #121212;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-    width: 100%;
-    position: relative;
-  }
-  
-  .footer-content {
-    display: flex;
-    flex-direction: column; /* Stack items vertically */
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
-    max-width: 1200px;
-    margin: auto;
-  }
-  
-  .social-links {
-    margin-top: 10px;
-  }
-  
-  .social-links a {
-    margin: 0 10px;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .social-links a:hover {
-    text-decoration: underline;
-  }
-  
+  background-color: #121212;
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  width: 100%;
+  position: relative;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
+  gap: 10px; /* Adds spacing between elements */
+}
+
+.social-links {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px; /* Adds space between social links */
+}
+
+.social-links a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out; /* Smooth hover effect */
+}
+
+.social-links a:hover {
+  color: #f39c12; /* Changes color on hover */
+  text-decoration: none;
+}
